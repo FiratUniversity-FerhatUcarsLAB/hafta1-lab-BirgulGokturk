@@ -1,4 +1,85 @@
-Öğrenci No:
-AD-SOYAD:
-
+Öğrenci No:250541094
+AD-SOYAD:Birgül Göktürk 
+KONU: Monopoly'de En İyi Hamle Seçimi
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+ALGORITMA EnIyiHamleSecimi_HibritMonopoly
+
+GIRDILER:
+    - oyuncuDurumu: konum, para, sahiplikler, ipotekler, hapiste mi?
+    - oyunTahtasi: 40 karelik yapı (arsa, şans, vergi, vs.)
+    - rakipler: her rakibin konumu, para, sahiplikleri
+    - oyunAşaması: erken / orta / geç
+    - geçmişHamleler: önceki turlarda yapılan hamleler
+    - simülasyonSayısı: kaç farklı oyun senaryosu çalıştırılacak (örnek: 1000)
+
+ÇIKTILAR:
+    - enIyiHamle: satın al, ipotekle, ev inşa et, takas yap, pas geç, vs.
+
+BAŞLAT
+
+    // 1. Dinamik Değerlendirme: Geçmiş hamlelerin etkisi
+    stratejiSkoru ← HesaplaStratejiSkoru(oyuncuDurumu, geçmişHamleler)
+
+    // 2. Olası hamleleri çıkar
+    olasıHamleler ← ["Satın Al", "Pas Geç", "Ev İnşa Et", "İpotekle", "Takas Yap"]
+
+    hamleSkorlari ← boş sözlük
+
+    // 3. Monte Carlo Simülasyonu: Her hamle için çoklu senaryo çalıştır
+    HER hamle IN olasıHamleler İÇİN
+        toplamKazanç ← 0
+
+        TEKRARLA simülasyonSayısı KERE
+            simülasyonDurumu ← KopyalaDurum(oyuncuDurumu, rakipler, oyunTahtasi)
+            simülasyonDurumu ← UygulaHamle(simülasyonDurumu, hamle)
+
+            // Simülasyon: 10 tur ileriye git
+            TUR ← 1
+            WHILE TUR ≤ 10
+                zar ← RastgeleZar()
+                simülasyonDurumu ← İlerle(simülasyonDurumu, zar)
+                simülasyonDurumu ← UygulaKareEtki(simülasyonDurumu)
+                TUR ← TUR + 1
+            END WHILE
+
+            kazanç ← HesaplaKazanç(simülasyonDurumu)
+            toplamKazanç ← toplamKazanç + kazanç
+        END TEKRARLA
+
+        ortalamaKazanç ← toplamKazanç / simülasyonSayısı
+        hamleSkoru ← stratejiSkoru × 0.4 + ortalamaKazanç × 0.6
+        hamleSkorlari[hamle] ← hamleSkoru
+    END HER
+
+    // 4. En yüksek skorlu hamleyi seç
+    enIyiHamle ← EnYüksekSkorluHamle(hamleSkorlari)
+
+    YAZDIR "Önerilen Hamle:", enIyiHamle
+
+BİTİR
+
+
+FONKSİYON HesaplaStratejiSkoru(oyuncuDurumu, geçmişHamleler)
+    skor ← 0
+    EĞER oyuncuDurumu.renkGrubuTamamlandı İSE skor ← skor + 50
+    EĞER oyuncuDurumu.para > 500 İSE skor ← skor + 30
+    EĞER geçmişHamleler İÇİNDE "ev inşa" varsa skor ← skor + 20
+    DÖNDÜR skor
+BİTİR
+
+
+FONKSİYON HesaplaKazanç(simülasyonDurumu)
+    netDeğer ← simülasyonDurumu.para + ToplamArsaDeğeri(simülasyonDurumu)
+    DÖNDÜR netDeğer
+BİTİR
+
+
+FONKSİYON EnYüksekSkorluHamle(hamleSkorlari)
+    enYüksek ← -∞
+    enIyi ← ""
+    HER hamle, skor IN hamleSkorlari
+        EĞER skor > enYüksek İSE
+            enYüksek ← skor
+            enIyi ← hamle
+    DÖNDÜR enIyi
+BİTİR
