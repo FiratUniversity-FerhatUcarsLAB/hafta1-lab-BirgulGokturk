@@ -1,4 +1,69 @@
-Öğrenci No:
-AD-SOYAD:
-
+Öğrenci No:250541094
+AD-SOYAD:Birgül Göktürk
+KONU: Optimum Bütçeli Market Alışvrişi Algoritması
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+ALGORITMA OptimumMarketAlisverisi
+
+GIRDILER:
+    - ürünListesi: Kullanıcının almak istediği ürünler ve miktarları (örnek: {"Süt": 2, "Ekmek": 1})
+    - bütçe: Kullanıcının toplam harcayabileceği miktar (örnek: 150 TL)
+    - tercihler: Kullanıcının ürün bazlı tercihleri (örnek: {"Süt": {"marka": "Pınar", "minimumKalite": 7}})
+    - marketVerisi: Market ürünleri listesi (her ürün için: isim, fiyat, gramaj, marka, kalite, kategori)
+
+ÇIKTILAR:
+    - seçilenÜrünler: Bütçeye uygun şekilde seçilen ürünler
+    - toplamHarcama: Seçilen ürünlerin toplam maliyeti
+    - alternatifler: Bütçeye sığmayan veya tercih dışı kalan ürünler için öneriler
+
+BAŞLAT
+
+    toplamHarcama ← 0
+    seçilenÜrünler ← boş liste
+    alternatifler ← boş sözlük
+
+    HER ürünAdı, miktar IN ürünListesi İÇİN
+        adaylar ← marketVerisi İÇİNDE ürünAdı eşleşen ürünler
+
+        EĞER ürünAdı tercihler İÇİNDE varsa
+            tercih ← tercihler[ürünAdı]
+            adaylar ← adaylar İÇİNDE
+                marka eşleşen VE kalite ≥ tercih.minimumKalite olan ürünler
+
+        EĞER adaylar boşsa
+            alternatifler[ürünAdı] ← "Uygun ürün bulunamadı"
+            DEVAM ET
+
+        HER ürün IN adaylar İÇİN
+            ürün.skor ← HesaplaSkor(ürün)
+
+        adaylar ← skorlarına göre azalan sırada sırala
+
+        SEÇİLEN ← adaylar[0]
+        maliyet ← SEÇİLEN.fiyat × miktar
+
+        EĞER toplamHarcama + maliyet ≤ bütçe İSE
+            seçilenÜrünler ← seçilenÜrünler + (SEÇİLEN, miktar)
+            toplamHarcama ← toplamHarcama + maliyet
+        DEĞİLSE
+            alternatifler[ürünAdı] ← adaylar[1:] (varsa)
+
+    SONRA
+
+    YAZDIR "Seçilen Ürünler:", seçilenÜrünler
+    YAZDIR "Toplam Harcama:", toplamHarcama
+    YAZDIR "Alternatif Öneriler:", alternatifler
+
+BİTİR
+
+
+FONKSİYON HesaplaSkor(ürün)
+    kaliteÖnemi ← 0.6
+    fiyatPerformansÖnemi ← 0.4
+
+    kalite ← ürün.kalite
+    fiyat ← ürün.fiyat
+    gramaj ← ürün.gramaj
+
+    skor ← (kalite × kaliteÖnemi) + ((gramaj / fiyat) × fiyatPerformansÖnemi)
+    DÖNDÜR skor
+BİTİR
