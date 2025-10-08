@@ -1,4 +1,78 @@
-Öğrenci No:
-AD-SOYAD:
-
+Öğrenci No:250541094
+AD-SOYAD:Birgül Göktürk
+KONU:Renkleri Karıştırarak Hedef Rengi Elde Etme
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+ALGORITMA HedefRenkKaristir_BolVeFethet
+
+GIRDILER:
+    - temelRenkler: Liste halinde RGB renkler [{R,G,B}, ...]
+    - hedefRenk: RGB formatında hedef renk {R,G,B}
+    - maksimumKarışımSayısı: En fazla kaç renk karıştırılabilir
+    - hassasiyet: Kabul edilebilir renk farkı (örnek: 5 birim)
+
+ÇIKTILAR:
+    - enIyiKarisim: Hedef renge en yakın karışım (renkler ve oranlar)
+    - renkFarki: Hedef renkle karışım arasındaki fark
+
+BAŞLAT
+
+    FONKSİYON BolVeFethet(renkListesi)
+        EĞER renkListesi uzunluğu = 1 İSE
+            DÖNDÜR renkListesi[0]
+
+        // Böl: Listeyi ikiye ayır
+        orta ← renkListesi uzunluğu / 2
+        solListe ← renkListesi[0:orta]
+        sağListe ← renkListesi[orta:]
+
+        // Fethet: Alt listeleri çöz
+        solKarışım ← BolVeFethet(solListe)
+        sağKarışım ← BolVeFethet(sağListe)
+
+        // Birleştir: İki karışımı oranla karıştır
+        enIyi ← NULL
+        enDüşükFark ← sonsuz
+
+        HER oran IN [0.0, 0.1, ..., 1.0] İÇİN
+            karisim ← Karistir(solKarışım, sağKarışım, oran)
+            fark ← RenkFarki(karisim, hedefRenk)
+
+            EĞER fark < enDüşükFark İSE
+                enDüşükFark ← fark
+                enIyi ← karisim
+
+            EĞER fark ≤ hassasiyet İSE
+                BREAK
+
+        DÖNDÜR enIyi
+
+    SON FONKSİYON
+
+    // Ana çağrı: Tüm temel renkleri kullanarak en iyi karışımı bul
+    enIyiKarisim ← BolVeFethet(temelRenkler)
+    renkFarki ← RenkFarki(enIyiKarisim, hedefRenk)
+
+    YAZDIR "🎯 En iyi karışım:", enIyiKarisim
+    YAZDIR "🎨 Renk farkı:", renkFarki
+
+BİTİR
+
+
+FONKSİYON Karistir(renk1, renk2, oran)
+    // İki rengi verilen oranla karıştır
+    R ← renk1.R × oran + renk2.R × (1 - oran)
+    G ← renk1.G × oran + renk2.G × (1 - oran)
+    B ← renk1.B × oran + renk2.B × (1 - oran)
+    DÖNDÜR {R, G, B}
+BİTİR
+
+
+FONKSİYON RenkFarki(renkA, renkB)
+    // Öklidyen mesafe ile renk farkı
+    fark ← sqrt(
+        (renkA.R - renkB.R)^2 +
+        (renkA.G - renkB.G)^2 +
+        (renkA.B - renkB.B)^2
+    )
+    DÖNDÜR fark
+BİTİR
