@@ -1,4 +1,74 @@
-Öğrenci No:
-AD-SOYAD:
-
+Öğrenci No:250541094
+AD-SOYAD:Birgül Göktürk 
+KONU:Telefon Rehberini Alfabetik Düzenleme
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+ALGORITMA TelefonRehberiYonetimi
+
+GIRDILER:
+    - rehberListesi: Kişi listesi (her kişi: isim, telefon)
+    - aramaTerimi: Kullanıcının aramak istediği isim (isteğe bağlı)
+
+ÇIKTILAR:
+    - sıralıRehber: Alfabetik olarak sıralanmış kişi listesi
+    - aramaSonucu: Arama terimi eşleşen kişi(ler)
+
+BAŞLAT
+
+    // 1. Rehberi alfabetik olarak sıralama (Bubble Sort)
+    N ← rehberListesi uzunluğu
+
+    TEKRARLA i ← 0'dan N-1'e
+        TEKRARLA j ← 0'dan N-i-2'ye
+            EĞER rehberListesi[j].isim > rehberListesi[j+1].isim İSE
+                TAKAS rehberListesi[j] ↔ rehberListesi[j+1]
+        SON TEKRARLA
+    SON TEKRARLA
+
+    sıralıRehber ← rehberListesi
+
+    YAZDIR "📒 Alfabetik Sıralı Rehber:"
+    HER kişi IN sıralıRehber İÇİN
+        YAZDIR kişi.isim, kişi.telefon
+
+    // 2. Arama işlemi (Binary Search)
+    EĞER aramaTerimi boş değilse
+        sol ← 0
+        sağ ← sıralıRehber uzunluğu - 1
+        aramaSonucu ← boş liste
+
+        WHILE sol ≤ sağ
+            orta ← (sol + sağ) / 2
+            isim ← sıralıRehber[orta].isim
+
+            EĞER isim = aramaTerimi İSE
+                aramaSonucu ← aramaSonucu + sıralıRehber[orta]
+
+                // Aynı isimden birden fazla varsa çevresini kontrol et
+                i ← orta - 1
+                WHILE i ≥ 0 VE sıralıRehber[i].isim = aramaTerimi
+                    aramaSonucu ← aramaSonucu + sıralıRehber[i]
+                    i ← i - 1
+
+                i ← orta + 1
+                WHILE i < sıralıRehber uzunluğu VE sıralıRehber[i].isim = aramaTerimi
+                    aramaSonucu ← aramaSonucu + sıralıRehber[i]
+                    i ← i + 1
+
+                BREAK
+            EĞER aramaTerimi < isim İSE
+                sağ ← orta - 1
+            DEĞİLSE
+                sol ← orta + 1
+        END WHILE
+
+        // Arama sonucu yazdır
+        EĞER aramaSonucu boşsa
+            YAZDIR "🚫 Arama sonucu bulunamadı."
+        DEĞİLSE
+            YAZDIR "🔍 Arama Sonucu:"
+            HER kişi IN aramaSonucu İÇİN
+                YAZDIR kişi.isim, kişi.telefon
+    DEĞİLSE
+        YAZDIR "🔎 Arama yapılmadı."
+
+BİTİR
