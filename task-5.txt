@@ -1,4 +1,116 @@
-Öğrenci No:
-AD-SOYAD:
-
+Öğrenci No:250541094
+AD-SOYAD:Birgül Göktürk
+KONU:Sağlıklı ve Şekersiz Tatlı Tarif Oluşturma
 Lütfen seçtiğiniz algoritmaya ait çözümü ve diğer isterleri aşağıya ekleyiniz:
+ALGORITMA SaglikliSekersizTatliTarifiUret
+
+GIRDILER:
+    - evdekiMalzemeler: Kullanıcının elindeki malzemeler listesi (örnek: {"muz": 2, "yulaf": 100g, "hurma": 50g})
+    - malzemeVerisi: Her malzeme için gramaj başına kalori ve kullanım tipi (örnek: {"muz": {kalori: 89/100g, tip: "tatlandırıcı"}})
+    - tarifVeritabanı: Önceden tanımlı sağlıklı tarif şablonları
+    - maksimumKalori: Kullanıcının tarifte görmek istediği maksimum kalori (isteğe bağlı)
+
+ÇIKTILAR:
+    - oluşturulanTarif: Malzeme listesi, gramajlar, yapılış adımları, toplam kalori
+    - kayıtDurumu: Tarifin başarıyla kaydedilip kaydedilmediği
+
+BAŞLAT
+
+    // 1. Uygun tarifleri filtrele
+    uygunTarifler ← boş liste
+
+    HER tarif IN tarifVeritabanı İÇİN
+        gerekliMalzemeler ← tarif.malzemeler
+
+        // Koşul: Tüm gerekli malzemeler evde var mı?
+        EĞER gerekliMalzemeler ⊆ evdekiMalzemeler.keys İSE
+            // Koşul: Kalori sınırı varsa kontrol et
+            toplamKalori ← 0
+            HER malzeme, miktar IN tarif.malzemeler İÇİN
+                kalori ← (malzemeVerisi[malzeme].kalori / 100) × miktar
+                toplamKalori ← toplamKalori + kalori
+
+            EĞER maksimumKalori belirtilmişse VE toplamKalori > maksimumKalori İSE
+                DEVAM ET // Bu tarif uygun değil
+
+            uygunTarifler ← uygunTarifler + tarif
+
+    // 2. Tarif bulunamadıysa öneri üret
+    EĞER uygunTarifler boşsa
+        YAZDIR "⚠️ Uygun tarif bulunamadı. Alternatif öneriler hazırlanıyor..."
+        alternatifTarif ← AlternatifTarifUret(evdekiMalzemeler, malzemeVerisi)
+        oluşturulanTarif ← alternatifTarif
+    DEĞİLSE
+        // 3. En uygun tarif seçimi (örneğin en düşük kalorili)
+        enIyiTarif ← uygunTarifler[0]
+        enDüşükKalori ← HesaplaKalori(enIyiTarif, malzemeVerisi)
+
+        HER tarif IN uygunTarifler İÇİN
+            kalori ← HesaplaKalori(tarif, malzemeVerisi)
+            EĞER kalori < enDüşükKalori İSE
+                enIyiTarif ← tarif
+                enDüşükKalori ← kalori
+
+        oluşturulanTarif ← enIyiTarif
+
+    // 4. Tarif detaylarını yazdır
+    YAZDIR "🍰 Tarif Adı:", oluşturulanTarif.ad
+    YAZDIR "📋 Malzemeler:"
+    HER malzeme, miktar IN oluşturulanTarif.malzemeler İÇİN
+        YAZDIR "- ", malzeme, ": ", miktar, "g"
+
+    YAZDIR "🧑‍🍳 Yapılışı:"
+    HER adım IN oluşturulanTarif.yapilis İÇİN
+        YAZDIR "- ", adım
+
+    toplamKalori ← HesaplaKalori(oluşturulanTarif, malzemeVerisi)
+    YAZDIR "🔥 Toplam Kalori:", toplamKalori, "kcal"
+
+    // 5. Tarif kaydı
+    kayıtDurumu ← TarifKaydet(oluşturulanTarif)
+
+    EĞER kayıtDurumu = "başarılı" İSE
+        YAZDIR "✅ Tarif başarıyla kaydedildi."
+    DEĞİLSE
+        YAZDIR "❌ Tarif kaydedilemedi."
+
+BİTİR
+
+
+FONKSİYON HesaplaKalori(tarif, malzemeVerisi)
+    toplam ← 0
+    HER malzeme, miktar IN tarif.malzemeler İÇİN
+        kalori ← (malzemeVerisi[malzeme].kalori / 100) × miktar
+        toplam ← toplam + kalori
+    DÖNDÜR toplam
+BİTİR
+
+
+FONKSİYON AlternatifTarifUret(evdekiMalzemeler, malzemeVerisi)
+    // Basit karışım önerisi: Tatlandırıcı + bağlayıcı + aroma
+    tatlandırıcı ← evdekiMalzemeler İÇİNDE tip = "tatlandırıcı" olan ilk malzeme
+    bağlayıcı ← evdekiMalzemeler İÇİNDE tip = "kıvam" olan ilk malzeme
+    aroma ← evdekiMalzemeler İÇİNDE tip = "aroma" olan ilk malzeme
+
+    tarif ← {
+        ad: "Evdeki Malzemelerle Tatlı",
+        malzemeler: {tatlandırıcı: 50g, bağlayıcı: 100g, aroma: 10g},
+        yapilis: [
+            "Tüm malzemeleri bir kapta karıştırın.",
+            "Karışımı şekil vererek buzdolabında 1 saat dinlendirin.",
+            "Soğuk olarak servis edin."
+        ]
+    }
+
+    DÖNDÜR tarif
+BİTİR
+
+
+FONKSİYON TarifKaydet(tarif)
+    // Tarif veritabanına eklenir
+    EĞER tarif geçerli formatta İSE
+        tarifVeritabanı ← tarifVeritabanı + tarif
+        DÖNDÜR "başarılı"
+    DEĞİLSE
+        DÖNDÜR "hata"
+BİTİR
